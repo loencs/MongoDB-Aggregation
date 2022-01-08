@@ -239,7 +239,11 @@ When possible, the optimization phase coalesces a pipeline stage into its predec
 ```
 
 #### Aggregation Pipeline Limits
+##### ข้อจำกัดขนาดผลลัพธ์ (Result Size Restrictions)
+คำสั่ง aggregation สามารถ return cursor หรือเก็บผลลัพธ์ในคอลเล็กชันได้ ข้อมูลแต่ละชุดในชุดผลลัพธ์ต้องมีขนาดเอกสาร BSON ขนาด 16 MB หากเอกสารใดเกินขีดจำกัดขนาดเอกสาร BSON การรวมจะทำให้เกิดข้อผิดพลาด ขีดจำกัดใช้กับเอกสารที่ return เท่านั้น ระหว่างการประมวลผล pipline ข้อมูลอาจมีขนาดเกินนี้ db.collection.aggregate() จะ return cursor โดยเป็นค่า default
 
-ข้อจำกัดขนาดผลลัพธ์ (Result Size Restrictions)
+##### ข้อจำกัดของจำนวน Stage (Number of Stages Restrictions)
+MongoDB จะให้มี pipeline มากสุดที่ 1000 
 
-
+##### ข้อจำกัดของหน่วยความจำ (Memory Restrictions)
+pipeline stage จะมี limit อยู่ที่ 100 MB เท่านั้น หากเกินจะเกิดข้อผิดพลาด
