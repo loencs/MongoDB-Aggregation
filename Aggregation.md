@@ -247,3 +247,13 @@ MongoDB จะให้มี pipeline มากสุดที่ 1000
 
 ##### ข้อจำกัดของหน่วยความจำ (Memory Restrictions)
 pipeline stage จะมี limit อยู่ที่ 100 MB เท่านั้น หากเกินจะเกิดข้อผิดพลาด
+
+##### Single Purpose Aggregation Operations
+MongoDB จัดเตรียม db.collection.estimatedDocumentCount(), db.collection.count() และ db.collection.distinct() 
+การดำเนินการทั้งหมดเหล่านี้ในการ aggregation จากคอลเลกชันเดียว แม้ว่าการดำเนินการเหล่านี้จะทำให้เข้าถึงกระบวนการรวมทั่วไปได้ง่าย แต่ก็ขาดความยืดหยุ่นและความสามารถของ Aggregation Pipeline
+
+![image](https://user-images.githubusercontent.com/53977686/148652662-21d0476d-e872-407d-be25-cc60de8391a5.png)
+
+
+
+
