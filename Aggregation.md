@@ -254,6 +254,13 @@ MongoDB จัดเตรียม db.collection.estimatedDocumentCount(), db.c
 
 ![image](https://user-images.githubusercontent.com/53977686/148652662-21d0476d-e872-407d-be25-cc60de8391a5.png)
 
+Map-Reduce
 
+Map-reduce สามารถเขียนใหม่ได้โดยใช้ตัวดำเนินการ Aggregation Pipeline เช่น $group, $merge และอื่นๆ
+
+สำหรับการใช้ Map-reduce ต้องกใช้ฟังก์ชันที่กำหนดเอง MongoDB จัดเตรียมตัวดำเนินการ Aggregation $accumulator และ $function ใช้ตัวดำเนินการเหล่านี้เพื่อกำหนดนิพจน์การรวมแบบกำหนดเองใน JavaScript
+
+เนื้อหาเพิ่มเติม
+https://docs.mongodb.com/manual/aggregation/
 
 
