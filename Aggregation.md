@@ -254,7 +254,7 @@ MongoDB จัดเตรียม db.collection.estimatedDocumentCount(), db.c
 
 ![image](https://user-images.githubusercontent.com/53977686/148652662-21d0476d-e872-407d-be25-cc60de8391a5.png)
 
-Map-Reduce
+#### Map-Reduce
 
 Map-reduce สามารถเขียนใหม่ได้โดยใช้ตัวดำเนินการ Aggregation Pipeline เช่น $group, $merge และอื่นๆ
 
