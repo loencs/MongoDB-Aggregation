@@ -40,12 +40,21 @@ db.orders.aggregate( [
 ] )
 ```
 
-##### $match stage:
+##### $match:
 - ใช้ในการ filter ค่า status ที่ตรงกับ urgent
 
-##### $group stage:
+##### $group:
 - ใช้จัดกลุ่มข้อมูล productName.
 - ใช้ $sum ในการคำนวณหา total quantity ในแต่ละ productName ซึ่งจะถูกเก็บไว้ใน field ของ sumQuantity และจะ returned aggregation pipeline.
+
+```js
+    $min, $max หาค่าของที่น้อยที่สุด หรือมากที่สุดของ field ที่ระบุ
+    $avg หาค่าเฉลี่ยของ field ที่ระบุ
+    $addToSet จับ field ที่ระบุมารวมกันเพื่อสร้างเป็น array ขึ้นมาใหม่ โดยข้อมูลใน array นี้จะไม่ซ้ำกัน
+    $first, $last กรณีข้อมูลเรียงมาก่อนหน้นานี้ สามารถหา document ตัวแรกสุด หรือตัวสุดท้ายมาใช้งานได้
+    $push, จับ field ที่ระบุมารวมกันเพื่อสร้างเป็น array ใหม่โดยไม่คัดตัวที่ซ้ำกันออกไป
+    $sum, หาผลรวมของข้อมูลในกลุ่ม (ตั้งแต่ MongoDB 3.2 $sum สามารถนำมาใช้ใน $project stage ได้ด้วย)
+```
 
 ตัวอย่าง
 ```js
@@ -54,6 +63,30 @@ db.orders.aggregate( [
    { _id: 'Iron rod', sumQuantity: 60 }
 ]
 ```
+
+##### $project
+ใช้สำหรับเลือก field ที่จะส่งไปยัง stage ถัดไป คล้ายกับที่คำสั่ง $match ที่เราใช้เลือก ข้อมูลหรือ document ที่จะส่งไปยัง stage ถัดไป โดยการที่เราเลือก document หรือเลือก field ก่อนที่จะส่งไปยัง stage ถัดไปนั้นส่งผลให้ขนาดของแต่ละ document ลดลงไปด้วย ทำให้ stage ถัดไป process document เฉพาะในส่วนที่ต้องใช้งานจริงๆ เท่านั้น และนี่ส่งผลดีต่อ performance ของระบบ
+
+##### $unwind
+ใช้สำหรับการแตกข้อมูล Array ออกมาแล้วจับคู่เข้ากับ document ที่เป็น owner เป็นรายตัวไป ยกตัวอย่างเช่น ถ้าเรามีข้อมูลแบบนี้
+
+{ "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] }
+แล้วเราลอง $unwind แบบนี้
+
+db.inventory.aggregate( [ { $unwind : "$sizes" } ] )
+จะได้ผลลัพธ์ดังนี้
+
+{ "_id" : 1, "item" : "ABC1", "sizes" : "S" }
+{ "_id" : 1, "item" : "ABC1", "sizes" : "M" }
+{ "_id" : 1, "item" : "ABC1", "sizes" : "L" }
+ถ้า stage ถัดไปเรา group by size และ count เราก็จะทราบจำนวนว่าแต่ละ size นั้นมี item กี่ชิ้น ดังนี้
+
+db.inventory.aggregate([
+ { $unwind: '$sizes' },
+ { $group: { _id: '$sizes', count: { $sum:1 } } }
+])
+
+
 
 #### การ Run Aggregation Pipeline
 ในการรันจะใช้ 
