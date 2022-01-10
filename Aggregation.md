@@ -42,6 +42,7 @@ db.orders.aggregate( [
 
 ##### $match:
 - ใช้ในการ filter ค่า status ที่ตรงกับ urgent
+ใช้ filter document มีมีเงื่อนไขตรงกับที่เรากำหนดไว้ ก่อนส่ง document ที่ match ไปยัง stage ถัดไป ซึ่ง $match จะช่วยลดจำนวน document ให้เหลือน้อยที่สุดเท่าที่ทำได้ ส่งผลให้ประสิทธิภาพของ pipeline ดีขึ้น เนื่องจากเหลือข้อมูลให้ process น้อยลง
 
 ##### $group:
 - ใช้จัดกลุ่มข้อมูล productName.
@@ -70,23 +71,62 @@ db.orders.aggregate( [
 ##### $unwind
 ใช้สำหรับการแตกข้อมูล Array ออกมาแล้วจับคู่เข้ากับ document ที่เป็น owner เป็นรายตัวไป ยกตัวอย่างเช่น ถ้าเรามีข้อมูลแบบนี้
 
+```js
 { "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] }
-แล้วเราลอง $unwind แบบนี้
+```
 
+ตัวอย่างการใช้ $unwind 
+
+```js
 db.inventory.aggregate( [ { $unwind : "$sizes" } ] )
+```
+
 จะได้ผลลัพธ์ดังนี้
 
+```js
 { "_id" : 1, "item" : "ABC1", "sizes" : "S" }
 { "_id" : 1, "item" : "ABC1", "sizes" : "M" }
 { "_id" : 1, "item" : "ABC1", "sizes" : "L" }
+```
+
 ถ้า stage ถัดไปเรา group by size และ count เราก็จะทราบจำนวนว่าแต่ละ size นั้นมี item กี่ชิ้น ดังนี้
 
+```js
 db.inventory.aggregate([
  { $unwind: '$sizes' },
  { $group: { _id: '$sizes', count: { $sum:1 } } }
 ])
+```
 
+##### $lookup
+ใช้ในการการเชื่อมกับคอลเล็กชันอื่น ๆ ที่เราต้องการนำมา join กัน เพื่อใช้หาข้อมูลที่ต้องการ
 
+```js
+{
+   $lookup:
+     {
+       from: <collection to join>,
+       localField: <field from the input documents>,
+       foreignField: <field from the documents of the "from" collection>,
+       as: <output array field>
+     }
+}
+```
+ตัวอย่างใช้งาน
+
+```js
+db.products.aggregate([
+    {
+      $lookup:
+        {
+          from: "category",
+          localField: "cat_id",
+          foreignField: "_id",
+          as: "category"
+        }
+   }
+])
+```
 
 #### การ Run Aggregation Pipeline
 ในการรันจะใช้ 
@@ -98,10 +138,12 @@ db.collection.aggregate() หรือ aggregate
 #### การ Update ข้อมูลโดยใช้ Aggregation Pipeline
 
 ##### *findAndModify*  
+
 ```js
 db.collection.findOneAndUpdate()  
 db.collection.findAndModify()  
 ```
+
 ##### *update*  
 ```js
 db.collection.updateOne()  
